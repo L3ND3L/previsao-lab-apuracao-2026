@@ -1,0 +1,46 @@
+name: Testar email pelo robo GitHub Actions
+
+on:
+  push:
+    branches: [teste-notificacao-actions-20261122]
+    paths: ['.github/workflows/testar-email-actions.yml']
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: teste-email-actions
+  cancel-in-progress: false
+
+jobs:
+  enviar-teste:
+    if: github.event.repository.private == false && github.repository == 'L3ND3L/previsao-lab-apuracao-2026'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Criar somente a Issue de teste
+        shell: bash
+        run: |
+          set -euo pipefail
+          existing="$(gh issue list --state all --limit 100 --json title,url --jq '.[] | select(.title == "Teste de email pelo GitHub Actions - sem apuracao") | .url')"
+          if [ -n "$existing" ]; then
+            echo "Issue de teste ja existe: $existing"
+            echo "Issue de teste ja existente: $existing" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          cat > "$RUNNER_TEMP/aviso-email.md" <<'EOF'
+          @L3ND3L este aviso foi criado pelo robô **github-actions[bot]**, em um teste separado de notificações por e-mail.
+
+          Se você recebeu este conteúdo por e-mail, a notificação desta Issue chegou ao endereço configurado no GitHub.
+
+          **Este teste não executa a apuração, não consulta o USGS e não altera previsões, resultados ou o agendamento existente.** Não há execução de modelos de IA nem APIs pagas.
+
+          Custo adicional de serviços: **R$0**, usando o processamento padrão gratuito deste repositório público.
+          EOF
+          url="$(gh issue create --title 'Teste de email pelo GitHub Actions - sem apuracao' --body-file "$RUNNER_TEMP/aviso-email.md")"
+          echo "$url"
+          echo "Issue criada pelo robo: $url" >> "$GITHUB_STEP_SUMMARY"
