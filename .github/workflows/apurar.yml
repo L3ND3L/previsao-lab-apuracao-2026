@@ -1,0 +1,67 @@
+name: Apurar previsao uma unica vez
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # UTC: 27/11/2026 00:00 = 26/11/2026 21:00 em Brasilia.
+    - cron: '0 0 27 11 *'
+  workflow_dispatch:
+    inputs:
+      somente_verificar:
+        description: 'Conferir dados e testes sem apurar ou desativar o agendamento'
+        type: boolean
+        default: true
+
+concurrency:
+  group: apuracao-unica
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+jobs:
+  apurar:
+    # Nunca iniciar processamento em repositorio privado.
+    if: github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Validar sem consultar resultado
+        run: |
+          python3 apurar.py --verificar
+          python3 -m unittest -v teste_nuvem.py
+          python3 -c "import urllib.request; r=urllib.request.urlopen('https://earthquake.usgs.gov/fdsnws/event/1/version',timeout=30); assert r.status==200 and r.read().strip(); print('Conexao publica com USGS validada, sem consulta de eventos.')"
+      - name: Apurar e preservar resultado no repositorio
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.somente_verificar == false)
+        run: |
+          python3 apurar.py
+          cat resultados/relatorio.md >> "$GITHUB_STEP_SUMMARY"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add resultados/
+          git commit -m 'Registrar primeira apuracao e resposta original USGS'
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Avisar pelo GitHub
+        if: success() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.somente_verificar == false))
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf '@%s\n\n' "$GITHUB_REPOSITORY_OWNER" > aviso.md
+          cat resultados/relatorio.md >> aviso.md
+          gh issue create --title 'Apuracao concluida: grupo versus agente unico' --body-file aviso.md
+      - name: Avisar falha sem inventar resultado
+        if: failure() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.somente_verificar == false))
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          printf '@%s A apuracao encontrou uma falha. Consulte https://github.com/%s/actions/runs/%s . Nenhuma previsao original foi alterada.\n' "$GITHUB_REPOSITORY_OWNER" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > aviso.md
+          gh issue create --title 'Apuracao: verificacao necessaria' --body-file aviso.md
+      - name: Desativar depois da tentativa agendada
+        if: always() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.somente_verificar == false))
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow disable apurar.yml

@@ -1,0 +1,52 @@
+{
+  "committed_at_utc": "2026-11-22T01:55:04.329277Z",
+  "comparison_limits": "Mesmo modelo e dossiê; baseline não vê os pares. Multiagente usa seis chamadas contra uma do baseline; orçamento desigual impede atribuir ganhos apenas à interação. Um evento não demonstra superioridade nem calibração.",
+  "cost_limit_brl": 0,
+  "cutoff_utc": "2026-11-22T01:47:57.886786Z",
+  "event": {
+    "end_utc_exclusive": "2026-11-24T00:00:00.000000Z",
+    "min_magnitude": 5.5,
+    "question": "Quantos terremotos M >= 5,5 no mundo constarão no catálogo USGS durante a janela?",
+    "resolution_deadline_utc": "2026-11-28T00:00:00.000000Z",
+    "resolution_not_before_utc": "2026-11-27T00:00:00.000000Z",
+    "resolution_policy": "Primeira captura bem-sucedida entre fim+72h e fim+96h. Fora do prazo: sem pontuação. IDs únicos, magnitude preferencial >=5.5, tempo de origem em [início,fim). Revisões posteriores não alteram a apuração original.",
+    "scenarios": {
+      "one": "Exatamente um",
+      "two_plus": "Dois ou mais",
+      "zero": "Nenhum"
+    },
+    "source": "USGS FDSN catálogo preferencial; eventtype=earthquake",
+    "start_utc": "2026-11-23T00:00:00.000000Z"
+  },
+  "forecasts": {
+    "multi_initial": [
+      0.5333333333333333,
+      0.3333333333333333,
+      0.13333333333333333
+    ],
+    "multi_revised": [
+      0.39999999999999997,
+      0.2333333333333333,
+      0.3666666666666667
+    ],
+    "poisson_reference": [
+      0.18268352405273466,
+      0.3105619908896489,
+      0.5067544850576164
+    ],
+    "single_agent": [
+      0.5714285714285714,
+      0.07142857142857142,
+      0.35714285714285715
+    ]
+  },
+  "original_forecast_sha256": "0555e024e9deb8eae4114c4fc6711111403a979e640717ba3088b0df74cee186",
+  "original_manifest_sha256": "d048d70d9800f92257bf93f07c88ca5f877e0b07775903c409c9bceb48851961",
+  "provenance": "Cópia mínima derivada da previsão local cuja integridade foi conferida. Não inclui prompts, nomes de usuário, caminhos locais, fontes congeladas ou modelo. Os originais permanecem locais; o hash permite vinculá-los ao pacote.",
+  "run_id": "20261122T014756Z_8e01aad0",
+  "scenario_order": [
+    "zero",
+    "one",
+    "two_plus"
+  ]
+}
