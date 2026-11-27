@@ -1,0 +1,26 @@
+{
+  "brier_multiclass_sum": {
+    "multi_initial": 1.1466666666666667,
+    "multi_revised": 0.6155555555555555,
+    "poisson_reference": 0.3731131581564456,
+    "single_agent": 0.7448979591836733
+  },
+  "comparison": "Grupo pontuou melhor",
+  "event_ids": [
+    "us6000ucvm",
+    "us6000ucxi"
+  ],
+  "exported_data_sha256": "fe1fca38c19a17828b8fdc841d3f3c28877df98ba5715ab063385102224449a6",
+  "multi_minus_single": -0.12934240362811777,
+  "observed_count": 2,
+  "original_forecast_sha256": "0555e024e9deb8eae4114c4fc6711111403a979e640717ba3088b0df74cee186",
+  "original_manifest_sha256": "d048d70d9800f92257bf93f07c88ca5f877e0b07775903c409c9bceb48851961",
+  "run_id": "20261122T014756Z_8e01aad0",
+  "source": {
+    "http_date": "Fri, 27 Nov 2026 01:00:22 GMT",
+    "http_status": 200,
+    "received_at_utc": "2026-11-27T01:00:22.583077Z",
+    "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2026-11-23T00%3A00%3A00.000000Z&endtime=2026-11-24T00%3A00%3A00.000000Z&minmagnitude=5.5&eventtype=earthquake&orderby=time-asc&limit=20000&nodata=204"
+  },
+  "winner": "two_plus"
+}
